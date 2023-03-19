@@ -1,0 +1,34 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define constants and parameters
+c = 3e8          # Speed of light (m/s)
+omega_1 = 2*np.pi*2e14 # Angular frequency of the first wave (Hz)
+omega_2 = 2*np.pi*2.1e14 # Angular frequency of the second wave (Hz)
+L = 1e-3        # Length of the non-linear medium (m)
+n2 = 2.5e-19     # Non-linear coefficient (m^2/V^2)
+E_1 = 1e5       # Amplitude of the first wave (V/m)
+E_2 = 1e5       # Amplitude of the second wave (V/m)
+n = 1.8
+# Compute the output wave
+omega_shg = omega_1 + omega_2    # Angular frequency of the second harmonic (Hz)
+k_1 = omega_1*n/c                 # Wave number of the first wave (1/m)
+k_2 = omega_2*n/c                 # Wave number of the second wave (1/m)
+k_shg = omega_shg/c             # Wave number of the second harmonic (1/m)
+E_shg = 2*n2*L*E_1*E_2/(c**2) * np.sin(k_1*L) * np.sin(k_2*L)   # Amplitude of the second harmonic (V/m)
+I_shg = E_shg**2/(2*c*n2)       # Intensity of the second harmonic (W/m^2)
+
+# Generate the plot
+t = np.linspace(0, 1e-12, 10000)   # Time array (s)
+x = c*t                           # Distance array (m)
+y1 = E_1*np.sin(k_1*x)            # First wave (V/m)
+y2 = E_2*np.sin(k_2*x)            # Second wave (V/m)
+y_shg = E_shg*np.sin(k_shg*x)     # Second harmonic (V/m)
+
+plt.plot(x, y1, label='First wave')
+plt.plot(x, y2, label='Second wave')
+plt.plot(x, y_shg, label='Second harmonic')
+plt.xlabel('Distance (m)')
+plt.ylabel('Electric field (V/m)')
+plt.legend()
+plt.show()
