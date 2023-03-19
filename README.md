@@ -1,2 +1,2 @@
 # Optics
-# parameters
+# Calculating different parameters variations across the optics in the laser system
