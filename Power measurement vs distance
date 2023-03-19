@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 19 16:24:30 2023
+
+@author: batman
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define laser parameters
+laser_power = 100  # Watts
+losses = np.array([0.2, 0.3, 0.4, 0.1])  # losses at each point
+num_points = len(losses)
+
+# Calculate total power at each point
+power = np.zeros(num_points)
+power[0] = laser_power  # power at the first point is the laser power
+for i in range(1, num_points):
+    power[i] = power[i-1] * (1 - losses[i-1])  # power at each point is previous power minus losses
+
+# Plot the results
+distance = np.arange(1, num_points+1)  # distance from laser source
+plt.plot(distance, power, 'bo-')
+plt.xlabel('Distance from Laser Source')
+plt.ylabel('Power (Watts)')
+plt.title('Power vs. Distance in Laser System')
+plt.show()
