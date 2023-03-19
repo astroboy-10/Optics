@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Mar 19 12:34:02 2023
+
+@author: batman
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define constants and parameters
+h = 6.626e-34  # Planck's constant (J*s)
+c = 3e8  # Speed of light (m/s)
+lambda_pump = 808e-9  # Pump wavelength (m)
+lambda_signal = 1064e-9  # Signal wavelength (m)
+doping_conc = 1.4e20  # Nd doping concentration (cm^-3)
+absorption_cross_section = 2.8e-19  # Absorption cross section of Nd ions (m^2)
+emission_cross_section = 3.8e-19  # Emission cross section of Nd ions (m^2)
+lifetime = 230e-6  # Lifetime of excited state of Nd ions (s)
+mirror_R1 = 0.998  # Reflectivity of mirror 1
+mirror_R2 = 0.998  # Reflectivity of mirror 2
+L = 10e-2  # Length of Nd:YAG crystal (m)
+r = 2.7e-3  # Radius of Nd:YAG crystal (m)
+gamma = 0.5  # Overlap factor between pump and signal mode
+P_pump = 20  # Pump power (W)
+t_start = 0  # Start time of simulation (s)
+t_end = 50e-3  # End time of simulation (s)
+N = 10000  # Number of time steps
+n = 1.8
+# Compute pump parameters
+omega_pump = 2*np.pi*c/lambda_pump  # Angular frequency of pump wave (rad/s)
+k_pump = omega_pump*n/c  # Wave vector of pump wave (1/m)
+A_pump = np.sqrt(2*P_pump/(h*c/lambda_pump))  # Amplitude of pump wave (V/m)
+
+# Compute signal parameters
+omega_signal = 2*np.pi*c/lambda_signal  # Angular frequency of signal wave (rad/s)
+k_signal = omega_signal*n/c  # Wave vector of signal wave (1/m)
+A_signal = 1  # Amplitude of signal wave (arbitrary units)
+
+# Generate time grid
+t = np.linspace(t_start, t_end, N)
+
+# Compute rate equations
+N0 = doping_conc  # Ground state population density (cm^-3)
+N1 = 100  # Excited state population density (cm^-3)
+N2 = 100 # Inverted state population density (cm^-3)
+N3 = 0  # Highly inverted state population density (cm^-3)
+dN0dt = emission_cross_section*N1*(N3-N2)/lifetime - absorption_cross_section*N0*A_pump*gamma
+dN1dt = absorption_cross_section*N0*A_pump*gamma - emission_cross_section*N1*(N3-N2)/lifetime
+dN2dt = emission_cross_section*N1*(N3-N2)/lifetime - absorption_cross_section*N2*A_signal*(1-mirror_R1)*np.exp(-2*k_signal*r)
+dN3dt = absorption_cross_section*N2*A_signal*(1-mirror_R1)*np.exp(-2*k_signal*r) - emission_cross_section*N3*(N2-N1)/lifetime
+
+# Integrate rate equations using Euler's method
+N0_arr = np.zeros(N)
+N1_arr = np.zeros(N)
+N2_arr = np.zeros(N)
+N3_arr = np.zeros(N)
+N0_arr[0] = N0
+N1_arr[0] = N1
+N2_arr[0] = N2
+N3_arr[0] = N3
+dt = (t_end - t_start) / N
+for i in range(1, N):
+    N0_arr[i] = N0_arr[i-1] + dN0dt*dt
+    N1_arr[i] = N1_arr[i-1] + dN1dt*dt
+    N2_arr[i] = N2_arr[i-1] + dN2dt*dt
+    N3_arr[i] = N3_arr[i-1] + dN3dt*dt
+    N0, N1, N2, N3 = N0_arr[i], N1_arr[i], N2_arr[i], N3_arr[i]
+    dN0dt = emission_cross_section*N1*(N3-N2)/lifetime - absorption_cross_section*N0*A_pump*gamma
+    dN1dt = absorption_cross_section*N0*A_pump*gamma - emission_cross_section*N1*(N3-N2)/lifetime
+    dN2dt = emission_cross_section*N1*(N3-N2)/lifetime - absorption_cross_section*N2*A_signal*(1-mirror_R1)*np.exp(-2*k_signal*r)
+    dN3dt = absorption_cross_section*N2*A_signal*(1-mirror_R1)*np.exp(-2*k_signal*r) - emission_cross_section*N3*(N2-N1)/lifetime
+
+# Compute output power and plot results
+P_out = (1-mirror_R2)*2*h*c**2*omega_signal**3*A_signal**2*(L/n)**2*emission_cross_section*N2_arr
+plt.plot(t*1e3, P_out)
+plt.xlabel('Time (ms)')
+plt.ylabel('Output power (W)')
+plt.show()
