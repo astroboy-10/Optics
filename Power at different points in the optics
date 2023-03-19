@@ -1,0 +1,17 @@
+import numpy as np
+
+# Define laser parameters
+laser_power = 100  # Watts
+losses = np.array([0.2, 0.3, 0.4, 0.1])  # losses at each point
+num_points = len(losses)
+
+# Calculate total power at each point
+power = np.zeros(num_points)
+power[0] = laser_power  # power at the first point is the laser power
+for i in range(1, num_points):
+    power[i] = power[i-1] * (1 - losses[i-1])  # power at each point is previous power minus losses
+
+# Print the results
+print("Total power at each point:")
+for i in range(num_points):
+    print(f"Point {i+1}: {power[i]} Watts")
