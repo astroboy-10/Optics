@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 20 22:23:29 2023
+
+@author: batman
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+
+# Define beam parameters
+w0 = 2.0  # Beam waist at waist
+zR = np.pi * w0 ** 2 / 1064e-9  # Rayleigh range
+lambda0 = 1064e-9  # wavelength
+k = 2 * np.pi / lambda0  # wave number
+z = np.linspace(-3 * zR, 3 * zR, 1000)  # Distance along the propagation
+x, y = np.meshgrid(np.linspace(-10, 10, 100), np.linspace(-10, 10, 100)) # Transverse coordinates
+
+# Calculate the beam radius along the propagation
+wz = w0 * np.sqrt(1 + (z / zR) ** 2)
+
+# Define the transverse profile of the beam
+def beam_profile(x, y, w):
+    return np.exp(-(x ** 2 + y ** 2) / w ** 2)
+
+# Calculate the intensity profile of the beam along the propagation
+def intensity_profile(z, x, y):
+    return beam_profile(x, y, wz[np.argmin(abs(z - z))] / np.sqrt(2)) ** 2
+
+# Create a figure and axis for 3D plotting
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+
+# Plot the intensity profile of the beam in 3D
+ax.plot_surface(x, y, intensity_profile(0, x, y), cmap='plasma', alpha=0.8)
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Intensity')
+ax.set_title('Spatial Profile of a Laser Beam')
+
+plt.show()
