@@ -1,0 +1,47 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 20 22:19:06 2023
+
+@author: batman
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
+
+# Define beam parameters
+w0 = 2.0  # Beam waist at waist
+zR = np.pi * w0 ** 2 / 1064e-9  # Rayleigh range
+lambda0 = 1064e-9  # wavelength
+k = 2 * np.pi / lambda0  # wave number
+z = np.linspace(-3 * zR, 3 * zR, 1000)  # Distance along the propagation
+
+# Define the Hermite-Gaussian and Laguerre-Gaussian modes
+H = [(2, 0), (0, 2), (1, 1)]  # (m, n) pairs for Hermite-Gaussian modes
+L = [(0, 1), (1, 0), (2, 0)]  # (p, l) pairs for Laguerre-Gaussian modes
+
+# Calculate the beam radius along the propagation
+wz = w0 * np.sqrt(1 + (z / zR) ** 2)
+
+# Create a figure and axis for 3D plotting
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+
+# Plot the modes versus the distance
+for m, n in H:
+    wmn = wz * np.sqrt(2 * abs(m) + 1) / w0
+    ax.plot(z, np.full_like(z, abs(m)), wmn ** 2, label=f'H({m},{n})')
+
+for p, l in L:
+    wpl = wz * np.sqrt(2 * p / (abs(l) + p))
+    ax.plot(z, np.full_like(z, p), wpl ** 2, label=f'L({p},{l})')
+
+# Add axis labels, title, and legend
+ax.set_xlabel('Distance (m)')
+ax.set_ylabel('Mode Number')
+ax.set_zlabel('Spot size (m)')
+ax.set_title('Fundamental and Spatial Modes of a Gaussian Beam')
+ax.legend()
+
+plt.show()
