@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 20 22:05:49 2023
+
+@author: batman
+"""
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the beam parameters
+w0 = 2  # beam waist
+lambda0 = 1064e-9  # wavelength
+k = 2 * np.pi / lambda0  # wavevector
+zR = np.pi * w0**2 / lambda0  # Rayleigh range
+
+# Define the z-axis range
+z = np.linspace(0, 5 * zR, 1000)
+
+# Calculate the beam waist along the z-axis
+wz = w0 * np.sqrt(1 + (z / zR)**2)
+
+# Plot the spot size along the z-axis
+plt.plot(z, wz)
+plt.xlabel('z (m)')
+plt.ylabel('Spot size (m)')
+plt.title('Spot Size of Gaussian Beam Along Propagation Direction')
+plt.show()
