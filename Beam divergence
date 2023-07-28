@@ -1,0 +1,29 @@
+#lens
+
+import math
+
+def calculate_beam_divergence(focal_length, wavelength):
+    """
+    Calculate the beam divergence (half-angle) based on lens properties and wavelength.
+
+    Parameters:
+        focal_length (float): The focal length of the lens (in meters).
+        wavelength (float): The wavelength of the laser beam (in meters).
+
+    Returns:
+        beam_divergence (float): The beam divergence in radians.
+    """
+    beam_divergence = (wavelength / (math.pi * focal_length))
+    return beam_divergence
+
+# Example usage:
+if __name__ == "__main__":
+    lens_focal_length = 0.1  # Focal length of the lens in meters
+    laser_wavelength = 532e-9  # Laser wavelength in meters (532 nm in scientific notation)
+
+    divergence_angle = calculate_beam_divergence(lens_focal_length, laser_wavelength)
+
+    # Convert radians to degrees for a more readable output
+    divergence_angle_degrees = math.degrees(divergence_angle)
+
+    print(f"The beam divergence is approximately {divergence_angle_degrees:.2f} degrees.")
